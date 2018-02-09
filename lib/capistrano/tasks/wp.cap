@@ -186,6 +186,16 @@ namespace :wp do
         # Flush permalinks
         execute :wp, "rewrite flush --path='dev-wp/wordpress'"
 
+        # Default pages
+        execute :wp, "post delete 1 --force --path='dev-wp/wordpress'"
+        execute :wp, "post delete 2 --force --path='dev-wp/wordpress'"
+        execute :wp, "post create --post_type=page --post_title='Accueil' --post_status=publish --comment_status=closed --ping_status=closed --path='dev-wp/wordpress'"
+        execute :wp, "post create --post_type=page --post_title='Contact' --post_status=publish --comment_status=closed --ping_status=closed --path='dev-wp/wordpress'"
+        execute :wp, "post create --post_type=page --post_title='Mentions Légales' --post_status=publish --comment_status=closed --ping_status=closed --path='dev-wp/wordpress'"
+
+        execute :wp, "option update show_on_front page --path='dev-wp/wordpress'"
+        execute :wp, "option update page_on_front 3 --path='dev-wp/wordpress'"
+
         # Remove sample file
         execute :rm, "-f dev-wp/wordpress/wp-config-sample.php"
 
