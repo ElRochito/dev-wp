@@ -1,0 +1,15 @@
+production:
+  host: localhost
+  database: database
+  username: username
+  password: 'password'
+staging:
+  host: localhost
+  database: database
+  username: username
+  password: 'password'
+local:
+  host: localhost
+  database: dbname
+  username: dbuser
+  password: 'dbuser'

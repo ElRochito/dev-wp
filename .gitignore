@@ -1,0 +1,58 @@
+## Global
+.vagrant
+.DS_Store
+.idea
+.idea/*
+html/
+log/
+.bundle/
+node_modules/
+
+## Puphpet
+puphpet/files/dot/ssh/*
+!puphpet/files/dot/ssh/insecure_private_key
+
+## Phinx
+phinx-conf.php
+phinx.yml
+vendor/
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+database.yml
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Thumbs.db
+
+
+# WordPress files #
+###################
+.htaccess
+dev-wp/xmlrpc.php
+dev-wp/sitemap.xml
+dev-wp/sitemap.xml.gz
+dev-wp/readme.html
+dev-wp/license.txt
+dev-wp/content/uploads/*
+dev-wp/content/upgrade/*
+dev-wp/content/cache/*
+dev-wp/content/backup/*
+dev-wp/content/languages/*
+dev-wp/wordpress/
+dev-wp/wp-config.php
+
+# Project #
+###########
+config/database.yml
+dev-wp/content/plugins/*
+
+!dev-wp/content/themes/dev-wp
+!dev-wp/content/plugins/dev-wp-customization
+
+composer.lock

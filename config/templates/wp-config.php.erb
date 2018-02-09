@@ -1,0 +1,26 @@
+<?php
+define('DB_NAME', '<%= database['database'] %>');
+define('DB_USER', '<%= database['username'] %>');
+define('DB_PASSWORD', '<%= database['password'] %>');
+define('DB_HOST', '<%= database['host'] %>');
+define('DB_CHARSET', 'utf8mb4');
+define('DB_COLLATE', 'utf8mb4_unicode_ci');
+define('WPLANG', '');
+
+$table_prefix  = '<%= database['prefix'] %>';
+
+<%= secret_keys %>
+
+define('WP_HOME','<%= wp_siteurl %>');
+define('WP_SITEURL','<%= wp_siteurl %>/wordpress');
+define('WP_CONTENT_URL', '<%= wp_siteurl %>/content');
+define('WP_CONTENT_DIR', '<%= www_path %>/content');
+
+if ( !defined('ABSPATH') ){
+ define('ABSPATH', dirname(__FILE__) . '/');
+}
+
+require_once(ABSPATH . 'wp-settings.php');
+
+define('WP_DEBUG', <%= debug %>);
+define('WP_DEBUG_LOG', <%= debug %>);

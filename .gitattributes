@@ -1,0 +1,17 @@
+# Autodetect text files
+* text=auto
+
+# Force the following filetypes to have unix eols, so Windows does not break them
+*.* text eol=lf
+*.ttf text eol=crlf
+
+*.gif binary
+*.jpg binary
+*.png binary
+
+*.eot binary
+*.ttf binary
+*.woff binary
+*.pdf binary
+*.mp3 binary
+*.mp4 binary

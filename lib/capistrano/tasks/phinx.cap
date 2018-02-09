@@ -1,0 +1,10 @@
+namespace :deploy do
+  namespace :migrations do
+    desc "Running migrations"
+    task :migrate do
+      on roles(:web) do
+        execute "cd #{release_path} && php vendor/bin/phinx migrate";
+      end
+    end
+  end
+end

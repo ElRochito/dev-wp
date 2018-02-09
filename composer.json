@@ -1,0 +1,36 @@
+{
+    "name": "ElRochito/dev-wp",
+    "require": {
+        "robmorgan/phinx": "0.9.*",
+        "composer/installers": "~1.0",
+        "advanced-custom-fields-pro": "5.6.8",
+        "wpackagist-plugin/members": "*",
+        "wpackagist-plugin/tinymce-advanced": "*",
+        "wpackagist-plugin/duplicate-post": "*",
+        "wpackagist-plugin/enable-media-replace": "*",
+        "wpackagist-plugin/wp-mail-smtp": "*"
+    },
+    "repositories": [{
+        "type": "composer",
+        "url": "https://wpackagist.org"
+    }, {
+        "type": "package",
+        "extra": {
+            "installer-name": "WordPress"
+        },
+        "package": {
+            "name": "advanced-custom-fields-pro",
+            "type": "wordpress-plugin",
+            "version": "5.6.8",
+            "dist": {
+                "url": "https://connect.advancedcustomfields.com/index.php?a=download&p=pro&k=<KEY>",
+                "type": "zip"
+            }
+        }
+    }],
+    "extra": {
+        "installer-paths": {
+            "dev-wp/content/plugins/{$name}/": ["type:wordpress-plugin"]
+        }
+    }
+}

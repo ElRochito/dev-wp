@@ -1,0 +1,36 @@
+namespace :composer do
+ desc "Running composer update"
+ task :update do
+   on roles(:web) do
+     within release_path do
+       execute "cd #{release_path} && composer install -n"
+     end
+   end
+ end
+end
+
+namespace :permission do
+  desc "Set permission"
+  task :set do
+    on roles(:web) do
+      within shared_path do
+        execute :chmod, "644 #{shared_path}/dev-wp/.htaccess"
+        execute :chmod, "-R 775 #{shared_path}/dev-wp/content/uploads"
+      end
+    end
+  end
+end
+
+namespace :robots do
+  desc "Creates robots.txt for non-production envs"
+  task :block do
+  	on roles(:app) do
+      if fetch(:stage) != :production then
+        io = StringIO.new('User-agent: *
+Disallow: /')
+        upload! io, File.join(release_path, "robots.txt")
+        execute :chmod, "644 #{release_path}/robots.txt"
+      end
+    end
+  end
+end

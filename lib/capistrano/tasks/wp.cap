@@ -1,0 +1,272 @@
+namespace :wp do
+  namespace :setup do
+
+    desc "Generates wp-config.php on remote server"
+    task :remote_files do
+      on roles(:web) do
+
+        # Get details for WordPress config file
+        secret_keys = capture("curl -s -k https://api.wordpress.org/secret-key/1.1/salt")
+        wp_siteurl = fetch(:stage_url)
+        database = YAML::load_file('config/database.yml')[fetch(:stage).to_s]
+
+        # Generate the table prefix
+        o = [('a'..'z'), ('A'..'Z')].map { |i| i.to_a }.flatten
+        prefix = (0...6).map { o[rand(o.length)] }.join
+        database['prefix'] = prefix + "_"
+
+        # Create config file in remote environment
+        www_path = fetch(:stage_www_path)
+        debug = fetch(:debug)
+        db_config = ERB.new(File.read('config/templates/wp-config.php.erb')).result(binding)
+        io = StringIO.new(db_config)
+        upload! io, File.join(shared_path, "dev-wp/wp-config.php")
+
+        execute :mkdir, "-p #{shared_path}/dev-wp/migrations"
+        execute :mkdir, "-p #{shared_path}/dev-wp/content/uploads"
+
+        # Create .htaccess in remote environment
+        migrationfile = ERB.new(File.read('config/templates/wp-conf.php.erb')).result(binding)
+        migration_path = fetch(:migration_path)
+        io = StringIO.new(migrationfile)
+        upload! io, File.join(shared_path, "phinx-conf.php")
+
+        # Create .htaccess in remote environment
+        accessfile = ERB.new(File.read('config/templates/.htaccess.erb')).result(binding)
+        io = StringIO.new(accessfile)
+        upload! io, File.join(shared_path, "dev-wp/.htaccess")
+
+        # Create phinxfile in remote environment
+        phinxfile = ERB.new(File.read('config/templates/phinx.yml.erb')).result(binding)
+        io = StringIO.new(phinxfile)
+        upload! io, File.join(shared_path, "phinx.yml")
+
+        execute :wp, "core download --locale=fr_FR --path=#{shared_path}/dev-wp/wordpress"
+
+      end
+      # Set some permissions
+      invoke 'permission:set'
+    end
+
+    desc "Setup WP on remote environment"
+    task :remote do
+      invoke 'db:confirm'
+      # invoke 'deploy'
+      # invoke 'wp:setup:remote_files'
+      on roles(:web) do
+
+        within release_path do
+
+          if !fetch(:wp_pass)
+            # Generate a random password
+            o = [('a'..'z'), ('A'..'Z')].map { |i| i.to_a }.flatten
+            password = (0...18).map { o[rand(o.length)] }.join
+          else
+            password = fetch(:wp_pass)
+          end
+
+          # Get WP details from config in /config
+          wp_siteurl = fetch(:stage_url)
+          title = fetch(:wp_sitename)
+          email = fetch(:wp_email)
+          user = fetch(:wp_user)
+
+          # Install WordPress
+          execute :wp, "core install --url='#{wp_siteurl}' --title='#{title}' --admin_user='#{user}' --admin_password='#{password}' --admin_email='#{email}' --path='dev-wp/wordpress'"
+
+          # Install fr_FR language
+          execute :wp, "core language install fr_FR --path='dev-wp/wordpress'"
+
+          # Activate fr_FR language
+          execute :wp, "core language activate fr_FR"
+
+          # Activate default theme
+          execute :wp, "theme activate dev-wp --path='dev-wp/wordpress'"
+
+          # Activate plugins
+          execute :wp, "plugin activate --all --path='dev-wp/wordpress'"
+
+          # Structure permalinks
+          execute :wp, "rewrite structure /%postname%/ --path='dev-wp/wordpress'"
+
+          # Flush permalinks
+          invoke 'wp:flush_permalinks'
+
+          # Remove sample file
+          execute :rm, "-f dev-wp/wordpress/wp-config-sample.php"
+
+          #if !fetch(:setup_all)
+            puts <<-MSG
+            \e[32m
+            =========================================================================
+              WordPress has successfully been installed. Here are your login details:
+
+              Username:       #{user}
+              Password:       #{password}
+              Email address:  #{email}
+              Log in at:      #{wp_siteurl}/wordpress/wp-admin
+            =========================================================================
+            \e[0m
+            MSG
+          #end
+
+        end
+
+      end
+    end
+
+    desc "Setup WP on local environment"
+    task :local do
+
+      run_locally do
+
+        o = [('a'..'z'), ('A'..'Z')].map { |i| i.to_a }.flatten
+        if !fetch(:wp_pass)
+          # Generate a random password
+          password = (0...18).map { o[rand(o.length)] }.join
+        else
+          password = fetch(:wp_pass)
+        end
+
+        # Get WP details from config in /config
+        title = fetch(:wp_sitename)
+        email = fetch(:wp_email)
+        user = fetch(:wp_user)
+        project_path = fetch(:project_path)
+        wp_siteurl = fetch(:wp_localurl)
+        www_path = fetch(:stage_www_path)
+        migration_path = fetch(:migration_path)
+        debug = fetch(:debug)
+
+        # Create wp-config.php
+        database = YAML::load_file('config/database.yml')['local']
+
+        # Generate the table prefix
+        prefix = (0...6).map { o[rand(o.length)] }.join
+        database['prefix'] = prefix + "_"
+
+        secret_keys = capture("curl -s -k https://api.wordpress.org/secret-key/1.1/salt")
+        db_config = ERB.new(File.read('config/templates/wp-config.php.erb')).result(binding)
+        File.open("dev-wp/wp-config.php", 'w') {|f| f.write(db_config) }
+
+        # Create wp-conf.php
+        migration_config = ERB.new(File.read('config/templates/wp-conf.php.erb')).result(binding)
+        File.open("phinx-conf.php", 'w') {|f| f.write(migration_config) }
+
+        # Create phinx.yml
+        phinxfile = ERB.new(File.read('config/templates/phinx.yml.erb')).result(binding)
+        io = StringIO.new(phinxfile)
+        upload! io, File.join(project_path, "phinx.yml")
+
+        # Create phinx.yml
+        htaccessfile = ERB.new(File.read('config/templates/.htaccess.erb')).result(binding)
+        io = StringIO.new(htaccessfile)
+        upload! io, File.join(www_path, ".htaccess")
+
+        execute :wp, "core download --locale=fr_FR --path=dev-wp/wordpress"
+
+        # Install WordPress
+        execute :wp, "core install --url='#{wp_siteurl}' --title='#{title}' --admin_user='#{user}' --admin_password='#{password}' --admin_email='#{email}' --path='dev-wp/wordpress'"
+
+        # Activate fr_FR language
+        execute :wp, "core language install fr_FR --path='dev-wp/wordpress'"
+
+        # Activate fr_FR language
+        execute :wp, "core language activate fr_FR --path='dev-wp/wordpress'"
+
+        # Activate default theme
+        execute :wp, "theme activate dev-wp --path='dev-wp/wordpress'"
+
+        # Activate plugins
+        execute :wp, "plugin activate --all --path='dev-wp/wordpress'"
+
+        # Structure permalinks
+        execute :wp, "rewrite structure /%postname%/ --path='dev-wp/wordpress'"
+
+        # Flush permalinks
+        execute :wp, "rewrite flush --path='dev-wp/wordpress'"
+
+        # Remove sample file
+        execute :rm, "-f dev-wp/wordpress/wp-config-sample.php"
+
+        # Migrations
+        execute :php, "vendor/bin/phinx migrate"
+
+        puts <<-MSG
+        \e[32m
+        =========================================================================
+          WordPress has successfully been installed. Here are your login details:
+
+          Username:       #{user}
+          Password:       #{password}
+          Email address:  #{email}
+        =========================================================================
+        \e[0m
+        MSG
+
+      end
+    end
+
+    desc "Setup WP on remote and local environments"
+    task :both do
+      set :setup_all, true
+
+      # Generate a random password
+      o = [('a'..'z'), ('A'..'Z')].map { |i| i.to_a }.flatten
+      password = (0...18).map { o[rand(o.length)] }.join
+      set :wp_pass, password
+
+      # Setup remote and local envs
+      invoke "wp:setup:remote"
+      invoke "wp:setup:local"
+    end
+  end
+
+  namespace :core do
+    desc "Updates the WP core"
+    task :update do
+
+      on roles(:web) do
+        within shared_path do
+          execute "cd #{shared_path} && wp core update --path='dev-wp/wordpress'";
+          execute "cd #{shared_path} && wp core language update --path='dev-wp/wordpress'";
+        end
+      end
+
+      run_locally do
+        execute :wp, "core update --path='dev-wp/wordpress'"
+        execute :wp, "core language update --path='dev-wp/wordpress'"
+      end
+
+      puts "WordPress submodule is now at the latest version."
+    end
+  end
+
+  namespace :permalinks do
+    desc "Flush permalinks"
+    task :flush do
+      on roles(:web) do
+        within release_path do
+          execute "cd #{release_path} && wp rewrite flush --path='dev-wp/wordpress'";
+        end
+      end
+    end
+  end
+
+  namespace :plugins do
+    desc "Plugins updates"
+    task :update do
+      on roles(:web) do
+        within release_path do
+          execute "cd #{release_path} && wp plugin update --all --path='dev-wp/wordpress'";
+        end
+      end
+      on roles(:local) do
+        run_locally do
+          execute "wp plugin update --all --path='dev-wp/wordpress'";
+        end
+      end
+    end
+  end
+
+end
