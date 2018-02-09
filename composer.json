@@ -6,6 +6,7 @@
         "advanced-custom-fields-pro": "5.6.8",
         "wpackagist-plugin/members": "*",
         "wpackagist-plugin/tinymce-advanced": "*",
+        "wpackagist-plugin/disable-comments": "*",
         "wpackagist-plugin/duplicate-post": "*",
         "wpackagist-plugin/enable-media-replace": "*",
         "wpackagist-plugin/wp-mail-smtp": "*"
