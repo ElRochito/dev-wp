@@ -197,17 +197,7 @@ namespace :wp do
         execute :wp, "option update page_on_front 3 --path='dev-wp/wordpress'"
 
         # Plugins settings
-        ## Disable comments
-        execute :wp, "option patch update disable_comments_options remove_everywhere 1 --path='dev-wp/wordpress'"
-        execute :wp, "option patch update disable_comments_options disabled_post_types '[\"page\",\"post\",\"attachment\"]' --format=json --path='dev-wp/wordpress'"
-
-        ## Members
-        execute :wp, "option update members_settings '{\"role_manager\":true,\"multi_roles\":true,\"explicit_denied_caps\":true,\"show_human_caps\":true,\"content_permissions_error\":\"Sorry, but you do not have permission to view this content.\",\"private_feed_error\":\"You must be logged into the site to view this content.\",\"content_permissions\":false,\"login_form_widget\":false,\"users_widget\":false,\"private_blog\":false,\"private_rest_api\":false,\"private_feed\":false}' --format=json --path='dev-wp/wordpress'"
-
-        ## WP Mail SMTP
-        hostname = URI(wp_siteurl).host
-        execute :wp, "option patch update wp_mail_smtp mail '{\"from_email\":\"wp@#{hostname}\",\"from_name\":\"WP\",\"mailer\":\"smtp\",\"return_path\":false}' --format=json --path='dev-wp/wordpress'"
-        execute :wp, "option patch update wp_mail_smtp smtp '{\"autotls\":true,\"host\":\"0.0.0.0\",\"port\":1025,\"encryption\":\"none\",\"user\":\"\",\"pass\":\"\",\"auth\":false}' --format=json --path='dev-wp/wordpress'"
+        invoke 'wp:plugins:settings'
 
         # Remove sample file
         execute :rm, "-f dev-wp/wordpress/wp-config-sample.php"
@@ -278,6 +268,24 @@ namespace :wp do
   end
 
   namespace :plugins do
+    desc "Default plugins settings"
+    task :settings do
+      run_locally do
+        ## Disable comments
+        execute :wp, "option patch update disable_comments_options remove_everywhere 1 --path='dev-wp/wordpress'"
+        execute :wp, "option patch update disable_comments_options disabled_post_types '[\"page\",\"post\",\"attachment\"]' --format=json --path='dev-wp/wordpress'"
+
+        ## Members
+        execute :wp, "option update members_settings '{\"role_manager\":true,\"multi_roles\":true,\"explicit_denied_caps\":true,\"show_human_caps\":true,\"content_permissions_error\":\"Sorry, but you do not have permission to view this content.\",\"private_feed_error\":\"You must be logged into the site to view this content.\",\"content_permissions\":false,\"login_form_widget\":false,\"users_widget\":false,\"private_blog\":false,\"private_rest_api\":false,\"private_feed\":false}' --format=json --path='dev-wp/wordpress'"
+
+        ## WP Mail SMTP
+        wp_siteurl = fetch(:stage_url)
+        hostname = URI(wp_siteurl).host
+        execute :wp, "option patch update wp_mail_smtp mail '{\"from_email\":\"wp@#{hostname}\",\"from_name\":\"WP\",\"mailer\":\"smtp\",\"return_path\":false}' --format=json --path='dev-wp/wordpress'"
+        execute :wp, "option patch update wp_mail_smtp smtp '{\"autotls\":true,\"host\":\"0.0.0.0\",\"port\":1025,\"encryption\":\"none\",\"user\":\"\",\"pass\":\"\",\"auth\":false}' --format=json --path='dev-wp/wordpress'"
+      end
+    end
+
     desc "Plugins updates"
     task :update do
       on roles(:web) do
