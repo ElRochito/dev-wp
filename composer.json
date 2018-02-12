@@ -9,7 +9,8 @@
         "wpackagist-plugin/disable-comments": "*",
         "wpackagist-plugin/duplicate-post": "*",
         "wpackagist-plugin/enable-media-replace": "*",
-        "wpackagist-plugin/wp-mail-smtp": "*"
+        "wpackagist-plugin/wp-mail-smtp": "*",
+        "wpackagist-plugin/wp-migrate-db": "*"
     },
     "repositories": [{
         "type": "composer",
