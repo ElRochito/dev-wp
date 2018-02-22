@@ -243,7 +243,7 @@ machines.each do |i, machine|
             id: "#{i}",
             group: sync_group,
             owner: sync_owner,
-            mount_options: ['dmode=775', 'fmode=774']
+            mount_options: ['dmode=777', 'fmode=774']
         end
       end
     end
