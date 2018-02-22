@@ -450,4 +450,71 @@ class Dev_Wp_Customization_Admin {
         return 'LEFT JOIN '.$wpdb->postmeta.' AS pm ON pm.post_id = '.$wpdb->posts.'.ID AND pm.meta_key="_wp_attached_file"';
     }
 
+    public function tinymce_customization($in) {
+        $in['remove_linebreaks']            = false;
+        $in['gecko_spellcheck']             = false;
+        $in['keep_styles']                  = true;
+        $in['accessibility_focus']          = true;
+        $in['tabfocus_elements']            = 'major-publishing-actions';
+        $in['media_strict']                 = false;
+        $in['paste_remove_styles']          = false;
+        $in['paste_remove_spans']           = false;
+        $in['paste_strip_class_attributes'] = 'none';
+        $in['paste_text_use_dialog']        = true;
+        $in['wpeditimage_disable_captions'] = true;
+        $in['plugins']                      = 'tabfocus,paste,media,fullscreen,wordpress,wpeditimage,wpgallery,wplink,wpdialogs';
+        $in['content_css']                  =  plugin_dir_url( __FILE__ ) . 'css/dev-wp-editor-style.css';
+        $in['wpautop']                      = true;
+        $in['apply_source_formatting']      = false;
+        $in['toolbar1']                     = 'bold,italic,underline,|,bullist,numlist,blockquote,hr,|,link,unlink,|,spellchecker,fullscreen,|,formatselect';
+        $in['toolbar2']                     = 'alignjustify,alignleft,aligncenter,alignright,removeformat,charmap,outdent,indent,undo,redo,wp_help ';
+        $in['block_formats']                = 'Paragraph=p;Heading 3=h3;Heading 4=h4;Heading 5=h5';
+
+        $menu           = array(
+            'file' => array(
+                'title' => 'File',
+                'items' => 'newdocument',
+            ),
+            'edit' => array(
+                'title' => 'Edit',
+                'items' => 'undo redo | cut copy paste pastetext | selectall',
+            ),
+            'insert' => array(
+                'title' => 'Insert',
+                'items' => 'link media | template hr',
+            ),
+            'format' => array(
+                'title' => 'Format',
+                'items' => 'bold italic underline strikethrough superscript subscript | removeformat',
+            ),
+            'table' => array(
+                'title' => 'Table',
+                'items' => 'inserttable tableprops deletetable | cell row column',
+            ),
+            'tools' => array(
+                'title' => 'Tools',
+                'items' => 'code',
+            ),
+        );
+        $in['menu']      = json_encode($menu);
+
+        // on crée un tableau contenant nos styles
+//        $style_formats = array(
+//            array(
+//                'title'     => __('Titre important', 'dev-wp') ,
+//                'block'     => 'h3',
+//                'classes'   => 'main-title',
+//            ),
+//            array(
+//                'title'     => __('References', 'dev-wp') ,
+//                'block'     => 'div',
+//                'classes'   => 'references',
+//            ),
+//        );
+//
+//        $in['style_formats']    = json_encode($style_formats);
+
+        return $in;
+    }
+
 }

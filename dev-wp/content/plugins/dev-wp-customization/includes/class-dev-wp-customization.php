@@ -132,7 +132,6 @@ class Dev_Wp_Customization {
         $this->loader->add_action( 'admin_menu', $plugin_admin, 'remove_actions' );
         $this->loader->add_action( 'setup_theme', $plugin_admin, 'wp_magic_unquotes' );
 
-
         $this->loader->add_action( 'admin_init', $plugin_admin, 'admin_color_schemes' );
         $this->loader->add_action( 'admin_head', $plugin_admin, 'admin_color_remove_choices' );
         $this->loader->add_action( 'user_register', $plugin_admin, 'admin_color_user_register_default' );
@@ -155,6 +154,8 @@ class Dev_Wp_Customization {
         $this->loader->add_filter( 'acf/location/rule_operators', $plugin_admin, 'acf_location_rules_operators' );
         $this->loader->add_filter( 'acf/location/rule_values/taxonomy_depth', $plugin_admin, 'acf_location_rules_values_taxonomy_depth' );
         $this->loader->add_filter( 'acf/location/rule_match/taxonomy_depth', $plugin_admin, 'acf_location_rules_match_taxonomy_depth', 10, 3 );
+
+        $this->loader->add_action( 'tiny_mce_before_init', $plugin_admin, 'tinymce_customization', 50 );
 
         $this->loader->add_filter( 'upload_mimes', $plugin_admin, 'wpc_mime_types' );
 
