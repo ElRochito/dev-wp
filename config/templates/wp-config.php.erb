@@ -24,3 +24,6 @@ require_once(ABSPATH . 'wp-settings.php');
 
 define('WP_DEBUG', <%= debug %>);
 define('WP_DEBUG_LOG', <%= debug %>);
+define('WP_POST_REVISIONS', 2);
+define('AUTOSAVE_INTERVAL', 300); // Seconds
+define('FS_METHOD', 'direct');
