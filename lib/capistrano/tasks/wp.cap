@@ -74,6 +74,9 @@ namespace :wp do
           # Install WordPress
           execute :wp, "core install --url='#{wp_siteurl}' --title='#{title}' --admin_user='#{user}' --admin_password='#{password}' --admin_email='#{email}' --path='dev-wp/wordpress'"
 
+          # Remove default description
+          execute :wp, "option update blogdescription '' --path='dev-wp/wordpress'"
+
           # Install fr_FR language
           execute :wp, "core language install fr_FR --path='dev-wp/wordpress'"
 
@@ -167,6 +170,9 @@ namespace :wp do
 
         # Install WordPress
         execute :wp, "core install --url='#{wp_siteurl}' --title='#{title}' --admin_user='#{user}' --admin_password='#{password}' --admin_email='#{email}' --path='dev-wp/wordpress'"
+
+        # Remove default description
+        execute :wp, "option update blogdescription '' --path='dev-wp/wordpress'"
 
         # Activate fr_FR language
         execute :wp, "core language install fr_FR --path='dev-wp/wordpress'"
