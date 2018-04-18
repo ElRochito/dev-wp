@@ -83,6 +83,9 @@ namespace :wp do
           # Activate fr_FR language
           execute :wp, "core language activate fr_FR"
 
+          # Update language
+          execute :wp, "core language update --path='dev-wp/wordpress'"
+
           # Activate default theme
           execute :wp, "theme activate dev-wp --path='dev-wp/wordpress'"
 
@@ -179,6 +182,9 @@ namespace :wp do
 
         # Activate fr_FR language
         execute :wp, "core language activate fr_FR --path='dev-wp/wordpress'"
+
+        # Update language
+        execute :wp, "core language update --path='dev-wp/wordpress'"
 
         # Activate default theme
         execute :wp, "theme activate dev-wp --path='dev-wp/wordpress'"
