@@ -228,7 +228,6 @@ php:
             - curl
             - gd
             - iconv
-            - imagick
             - intl
             - mbstring
             - xml
