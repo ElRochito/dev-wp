@@ -63,17 +63,6 @@ class Dev_Wp_Customization_Admin {
         $_REQUEST = array_merge( $_GET, $_POST );
     }
 
-    /**
-     * Register the stylesheets for the admin area.
-     *
-     * @since    1.0.0
-     */
-    public function enqueue_styles() {
-
-        wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/dev-wp-customization-admin.css', array(), $this->version, 'all' );
-
-    }
-
     /*
      *
      */
